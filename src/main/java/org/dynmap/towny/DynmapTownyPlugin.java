@@ -490,26 +490,48 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
 
        	v = v.replace("%bank%", townBankBalanceCache.containsKey(town) ? TownyEconomyHandler.getFormattedBalance(townBankBalanceCache.get(town)) : "Accounts loading...");
-        
-        String nation = "";
-		try {
-			if(town.hasNation())
-				nation = town.getNation().getName();
-		} catch (Exception e) {
-		}
+
+        String nation;
+        try {
+            nation = town.getNation().getFormattedName().replace(" (Nation)", "");
+            nation = town.getNation().getName().replace("_", " ");
+        } catch (Exception e) { nation = ""; }
+
         v = v.replace("%nation%", nation);
 
-		String natStatus = "";
+        String natStatus = "";
         if (town.isCapital()) {
             natStatus = "Capital of " + nation;
         } else if (town.hasNation()) {
             natStatus = "Member of " + nation;
         }
 
+        String townicon = "";
+        if (town.isCapital()) {
+            townicon = "<img src=\"tiles/_markers_/king.png\">  ";
+        } else if (town.hasNation()) {
+            townicon = "<img src=\"tiles/_markers_/blueflag.png\">  ";
+        } else {
+            townicon = "<img src=\"tiles/_markers_/greenflag.png\">  ";
+        }
+
+
+        String townnation = townicon + " <span style=\"font-weight:bold;font-size:150%\"> " + town.getName() + " </span><br /><span style=\"font-size:140%;line-height:1.2;text-indent:2.0em\">" + natStatus + "</span>";
+        if (town.isCapital()) {
+            townnation = townicon + " <span style=\"font-weight:bold;font-size:150%\"> " + town.getName() + " </span><br /><span style=\"font-size:140%;line-height:1.2;text-indent:2.0em\">" + natStatus + "</span>";
+        } else if (town.hasNation()) {
+            townnation = townicon + " <span style=\"font-weight:bold;font-size:150%\"> " + town.getName() + " </span><br /><span style=\"font-size:140%;line-height:1.2;text-indent:2.0em\">" + natStatus + "</span>";
+        } else {
+            townnation = townicon + " <span style=\"font-weight:bold;font-size:150%\"> " + town.getName() + " </span>";
+        }
+        v = v.replace("%town-nation%", townnation);
+
         v = v.replace("%nationstatus%", natStatus);
 
-        if (TownySettings.isUsingEconomy())
-        	v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
+        v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
+
+        String pvpflg = "PvP: <span style=\"font-weight:bold\">" + town.isPVP() + "</span>";
+        v = v.replace("%pvp%", pvpflg);
 
         /* Build flags */
         String flgs = "Has Upkeep: " + town.hasUpkeep();
