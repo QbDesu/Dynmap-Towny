@@ -449,19 +449,25 @@ public class DynmapTownyPlugin extends JavaPlugin {
             v = v.replace("%regionname%", town.getName() + "(" + btype.toString() + ")");
         else
             v = v.replace("%regionname%", town.getName());
-        v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
-        String res = "";
+        String prefix = town.getMayor().getNamePrefix();
+        if(prefix == "") {
+            v = v.replace("%mayorformatted%", "Mayor " + town.getMayor().getFormattedTitleName());
+        } else {
+            v = v.replace("%mayorformatted%", town.hasMayor()?town.getMayor().getFormattedTitleName().replace("&1", "").replace("&2", "").replace("&3", "").replace("&4", "").replace("&5", "").replace("&6", "").replace("&7", "").replace("&8", "").replace("&9", "").replace("&0", "").replace("&a", "").replace("&b", "").replace("&c", "").replace("&d", "").replace("&e", "").replace("&f", "").replace("&n", "").replace("&m", "").replace("&l", "").replace("&k", "").replace("&o", ""):"");
+        }
+        v= v.replace("%mayorname%", town.hasMayor()?town.getMayor().getName():"");
+       String res = "";
         for(Resident r : town.getResidents()) {
         	if(res.length()>0) res += ", ";
         	res += r.getName();
         }
-        v = v.replace("%playermembers%", res);
+        v = v.replace("%residents%", res);
         String mgrs = "";
         for(Resident r : town.getRank("assistant")) {
             if(mgrs.length()>0) mgrs += ", ";
             mgrs += r.getName();
         }
-        v = v.replace("%playermanagers%", res);
+        v = v.replace("%managers%", res);
 
         String dispNames = "";
         for (Resident r: town.getResidents()) {
@@ -516,7 +522,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
 
 
-        String townnation = townicon + " <span style=\"font-weight:bold;font-size:150%\"> " + town.getName() + " </span><br /><span style=\"font-size:140%;line-height:1.2;text-indent:2.0em\">" + natStatus + "</span>";
+        String townnation = "";
         if (town.isCapital()) {
             townnation = townicon + " <span style=\"font-weight:bold;font-size:150%\"> " + town.getName() + " </span><br /><span style=\"font-size:140%;line-height:1.2;text-indent:2.0em\">" + natStatus + "</span>";
         } else if (town.hasNation()) {
@@ -530,7 +536,14 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
 
-        String pvpflg = "PvP: <span style=\"font-weight:bold\">" + town.isPVP() + "</span>";
+        String pvpflg = "";
+        if (town.isAdminEnabledPVP() == true) {
+            pvpflg = "PvP: <span style=\"font-weight:bold\">Enabled (War)</span>";
+        } else if (town.isPVP() == true) {
+            pvpflg = "PvP: <span style=\"font-weight:bold\">Enabled</span>";
+        } else if (town.isPVP() == false) {
+            pvpflg = "PvP: <span style=\"font-weight:bold\">Disabled</span>";
+        }
         v = v.replace("%pvp%", pvpflg);
 
         /* Build flags */
